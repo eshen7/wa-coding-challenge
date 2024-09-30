@@ -4,16 +4,22 @@ using namespace cv;
 using namespace std;
 
 int main() {
+  // read image
   Mat image = imread("red.png");
   namedWindow("image", WINDOW_NORMAL);
+  // create output image to draw lines on
   Mat output = image.clone();
   Mat hsvImage;
+  // convert image to hsv for thresholding
   cvtColor(image, hsvImage, COLOR_BGR2HSV);
+  // bright red range
   Scalar lowerRed(0, 140, 190), upperRed(10, 255, 255);
   Mat redMask;
+  // find contours
   inRange(hsvImage, lowerRed, upperRed, redMask);
   vector<vector<Point> > contours;
   findContours(redMask, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+  // find center of each contour
   vector<Point2f> centers;
   for (int i = 0; i < contours.size(); i++) {
     double area = contourArea(contours[i]);
@@ -25,6 +31,7 @@ int main() {
       }
     }
   }
+  // check whether each contour is on the left or right
   vector<Point2f> left;
   vector<Point2f> right;
   for (Point2f contour : centers) {
@@ -35,6 +42,7 @@ int main() {
       left.push_back(contour);
     }
   }
+  // fit a line through each contour and draw it from x = 0 to x = end of image
   Vec4f leftLine;
   Vec4f rightLine;
   fitLine(left, leftLine, 4, CV_PI / 2, CV_PI / 2, true);
@@ -53,6 +61,7 @@ int main() {
   rightPoint2.y = rightPoint0.y + (rightLine[1] / rightLine[0]) * (rightPoint2.x - rightPoint0.x);
   line(output, leftPoint1, leftPoint2, Scalar(0, 0, 255), 5);
   line(output, rightPoint1, rightPoint2, Scalar(0, 0, 255), 5);
+  // output image
   while (true) {
     imshow("image", output);
     waitKey(20);
