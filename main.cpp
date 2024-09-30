@@ -6,7 +6,6 @@ using namespace std;
 int main() {
   // read image
   Mat image = imread("red.png");
-  namedWindow("image", WINDOW_NORMAL);
   // create output image to draw lines on
   Mat output = image.clone();
   Mat hsvImage;
@@ -61,9 +60,6 @@ int main() {
   rightPoint2.y = rightPoint0.y + (rightLine[1] / rightLine[0]) * (rightPoint2.x - rightPoint0.x);
   line(output, leftPoint1, leftPoint2, Scalar(0, 0, 255), 5);
   line(output, rightPoint1, rightPoint2, Scalar(0, 0, 255), 5);
-  // output image
-  while (true) {
-    imshow("image", output);
-    waitKey(20);
-  }
+  // write image to file
+  imwrite("answer.png", output);
 }
